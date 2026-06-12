@@ -40,7 +40,8 @@ export async function signUp(formData: FormData): Promise<ActionResult> {
   }
 
   const supabase = createClient();
-  const origin = headers().get("origin") ?? "";
+  // Prefer a configured site URL over the caller-controlled Origin header.
+  const origin = process.env.NEXT_PUBLIC_SITE_URL ?? headers().get("origin") ?? "";
   const { error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
