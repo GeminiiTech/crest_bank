@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Menu } from "lucide-react";
 import { Logo } from "@/components/shared/logo";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { navLinks } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
@@ -43,6 +43,7 @@ export function Navbar() {
           </SheetTrigger>
           <SheetContent side="right" className="w-72 bg-navy-900 text-white border-navy-700">
             <SheetTitle className="text-white">Menu</SheetTitle>
+            <SheetDescription className="sr-only">Crest Bank navigation menu</SheetDescription>
             <div className="mt-8 flex flex-col gap-1">
               {navLinks.map((l) => (
                 <Link key={l.label} href={l.href} className="rounded-lg px-3 py-2 text-base font-medium text-slate-200 hover:bg-white/10">
