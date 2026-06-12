@@ -29,9 +29,14 @@ create policy "transactions select own" on public.transactions for select
 create policy "transactions insert own" on public.transactions for insert
   with check (account_id in (select id from public.accounts where user_id = auth.uid()));
 
--- transfers: select/insert scoped to owned source account; no client update/delete
+-- transfers: insert scoped to owned source account; no client update/delete.
+-- select visible to BOTH sender (from_account_id) and recipient (to_account_id)
+-- so inbound transfers appear for the receiving user.
 create policy "transfers select own" on public.transfers for select
-  using (from_account_id in (select id from public.accounts where user_id = auth.uid()));
+  using (
+    from_account_id in (select id from public.accounts where user_id = auth.uid())
+    or to_account_id in (select id from public.accounts where user_id = auth.uid())
+  );
 create policy "transfers insert own" on public.transfers for insert
   with check (from_account_id in (select id from public.accounts where user_id = auth.uid()));
 
