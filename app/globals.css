@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 40% 99%;
+    --foreground: 213 64% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 213 64% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 213 64% 11%;
+    --primary: 220 87% 56%; /* azure-500 #2D6FF0 */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 214 32% 91%;
+    --secondary-foreground: 213 64% 11%;
+    --muted: 214 32% 95%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 214 32% 91%;
+    --accent-foreground: 213 64% 11%;
+    --success: 160 84% 39%; /* mint-500 #10B981 */
+    --success-foreground: 0 0% 100%;
+    --destructive: 347 77% 50%; /* rose-500 #E11D48 */
+    --destructive-foreground: 0 0% 100%;
+    --border: 214 32% 88%;
+    --input: 214 32% 88%;
+    --ring: 220 87% 56%;
+    --radius: 0.75rem;
+    /* brand navy scale */
+    --navy-950: 213 67% 10%;
+    --navy-900: 212 65% 11%;
+    --navy-800: 211 65% 16%;
+    --navy-700: 213 59% 22%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
