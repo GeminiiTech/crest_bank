@@ -57,6 +57,7 @@ Copy `.env.example` → `.env.local`:
 | `NEXT_PUBLIC_SUPABASE_URL` | public | Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | public | Supabase anon key (RLS-protected) |
 | `SUPABASE_SERVICE_ROLE_KEY` | **server-only** | Privileged key — never import into client code |
+| `NEXT_PUBLIC_SITE_URL` | public | App origin used to build auth email confirmation links (e.g. `http://localhost:3000`). Falls back to the request `Origin` header when unset. |
 
 The service-role key bypasses RLS and must only ever be used in server-side code (API route
 handlers, server actions). It is not referenced anywhere in the current codebase.
@@ -90,24 +91,56 @@ Migration order matters — foreign keys, the shared `set_updated_at()` function
 | `0010_storage_buckets.sql` | `avatars`, `kyc-documents`, `marketing-assets` buckets + storage RLS |
 | `0011_rls_policies.sql` | Enables RLS + owner policies on all 8 tables |
 
+## Authentication (M2)
+
+Email/password **registration** and **login** with **required email verification**, built on
+Supabase Auth via Next.js Server Actions. Route protection runs in the session middleware.
+
+### Required Supabase dashboard settings
+
+1. **Authentication → Providers → Email:** enabled, with **"Confirm email" ON**.
+2. **Authentication → URL Configuration:**
+   - **Site URL:** your app origin (e.g. `http://localhost:3000`; your deployed URL in prod).
+   - **Redirect URLs:** add `<origin>/auth/confirm` (e.g. `http://localhost:3000/auth/confirm`).
+3. **Authentication → Email Templates → Confirm signup:** point the link at
+   `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email`.
+   (The default `{{ .ConfirmationURL }}` also works — the `/auth/confirm` route falls back to
+   `exchangeCodeForSession` when a `code` param is present.)
+4. Set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and (recommended)
+   `NEXT_PUBLIC_SITE_URL` in `.env.local`, then restart the dev server.
+
+### Manual test plan
+
+1. Go to `/register`, fill the form, submit → you land on `/verify-email`.
+2. Open the confirmation email → click the link → you land on `/dashboard`.
+3. Try `/login` **before** confirming → blocked with "Please confirm your email first."
+4. Log in with confirmed credentials → `/dashboard`; wrong credentials → "Incorrect email or password."
+5. While logged out, visit `/dashboard` → redirected to `/login?next=/dashboard`.
+6. While logged in, visit `/login` or `/register` → redirected to `/dashboard`.
+7. Click **Sign out** → session cleared, back to `/login`.
+
 ## Architecture
 
 ```
 app/
   (marketing)/        route group: navbar + footer shell, landing + stub pages
-  login, register/    auth route stubs (full flow in M2)
+  (auth)/             login, register, verify-email (+ actions.ts server actions)
+  auth/confirm/       email-confirmation GET route
+  dashboard/          protected stub (M2) — real dashboard in M3
   design-system/      living style guide (noindex)
   layout.tsx          fonts + metadata
 components/
   ui/                 classic Radix shadcn primitives
+  auth/               login-form, register-form, password-input
   marketing/          landing sections (hero, stats, features, …)
   shared/             navbar, footer, logo, motion/reveal
 lib/
-  supabase/           client.ts, server.ts, middleware.ts (creds-optional)
-  validations/        zod schemas
+  auth/               redirects.ts (pure resolveAuthRedirect/sanitizeNext)
+  supabase/           client.ts, server.ts, middleware.ts (creds-optional + route gating)
+  validations/        zod schemas (newsletter, auth)
   constants.ts        typed page content (single source of truth)
 supabase/migrations/  numbered SQL (schema, indexes, triggers, RLS, storage)
-middleware.ts         session refresh (route gating lands in M2)
+middleware.ts         session refresh + auth route protection
 ```
 
 - **Design tokens** are CSS variables in `app/globals.css` (HSL channels) mapped into
@@ -130,13 +163,17 @@ middleware.ts         session refresh (route gating lands in M2)
 - **Security headers** (`X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`,
   `Referrer-Policy: strict-origin-when-cross-origin`) are set in `next.config.mjs`.
 - **Validation:** all forms use Zod schemas; Supabase queries are parameterized.
-- **Rate limiting (planned, M2):** mutating API route handlers will apply a per-IP +
-  per-user token-bucket limit (e.g. Upstash Ratelimit) before touching the database.
+- **Auth writes are server-side** (Server Actions, anon key only); login errors are generic to
+  limit account enumeration; `next`/redirect params are sanitized to internal paths (no open
+  redirect); email confirmation links use a configured site URL, not the inbound `Origin`.
+- **Rate limiting:** M2 relies on Supabase Auth's built-in limits; app-level per-IP/per-user
+  limiting on custom mutating routes (e.g. Upstash Ratelimit) lands with those routes in M4.
 
 ## Roadmap
 
 - **M1 (done):** foundation — design system, landing page, Supabase wiring, full DB backend.
-- **M2:** auth (login/register/reset/verify) + protected-route middleware.
+- **M2 (done):** auth — email/password register + login, required email verification,
+  protected-route middleware, protected dashboard stub. (Password reset deferred.)
 - **M3:** dashboard overview + accounts.
 - **M4:** transfers, beneficiaries, transactions (server-side balance mutations).
 - **M5:** cards + settings.
