@@ -11,6 +11,7 @@ function mapTransferError(message: string): string {
   if (m.includes("insufficient")) return "You don't have enough funds for this transfer.";
   if (m.includes("same account")) return "Choose a different destination account.";
   if (m.includes("not active")) return "That account is not active.";
+  if (m.includes("currency")) return "Both accounts must use the same currency.";
   if (m.includes("source account")) return "Source account not found.";
   if (m.includes("destination account")) return "Destination account not found.";
   if (m.includes("beneficiary")) return "Beneficiary not found.";

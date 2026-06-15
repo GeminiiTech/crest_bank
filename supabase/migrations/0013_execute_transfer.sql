@@ -51,6 +51,12 @@ begin
     if not found or v_to.user_id <> v_uid then
       raise exception 'Destination account not found';
     end if;
+    if v_to.status <> 'active' then
+      raise exception 'Destination account is not active';
+    end if;
+    if v_to.currency <> v_from.currency then
+      raise exception 'Both accounts must use the same currency';
+    end if;
 
     update public.accounts set balance = balance - p_amount where id = p_from_account;
     update public.accounts set balance = balance + p_amount where id = p_to_account;
