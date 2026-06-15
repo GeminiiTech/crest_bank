@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { beneficiarySchema, type BeneficiaryInput } from "@/lib/validations/beneficiary";
@@ -30,6 +30,7 @@ export function BeneficiaryForm({
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<BeneficiaryInput>({
     resolver: zodResolver(beneficiarySchema),
@@ -44,6 +45,11 @@ export function BeneficiaryForm({
         }
       : { type: "external" },
   });
+
+  // Clear a fresh "Add" form each time it opens (avoid stale values from a prior cancel).
+  useEffect(() => {
+    if (open && !beneficiary) reset({ type: "external" });
+  }, [open, beneficiary, reset]);
 
   function onSubmit(values: BeneficiaryInput) {
     setFormError(null);

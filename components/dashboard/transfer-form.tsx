@@ -87,7 +87,20 @@ export function TransferForm({
 
       <div>
         <label htmlFor="tf-from" className="mb-1 block text-sm font-medium">From account</label>
-        <select id="tf-from" className={selectClass} value={fromId} onChange={(e) => setFromId(e.target.value)}>
+        <select
+          id="tf-from"
+          className={selectClass}
+          value={fromId}
+          onChange={(e) => {
+            const next = e.target.value;
+            setFromId(next);
+            // Keep the internal destination valid when it collides with the new source.
+            if (toId === next) {
+              const fallback = accounts.find((a) => a.id !== next);
+              setToId(fallback?.id ?? "");
+            }
+          }}
+        >
           {accounts.map((a) => (
             <option key={a.id} value={a.id}>
               {accountTypeLabel(a.type)} {maskAccountNumber(a.account_number)} — {formatCurrency(a.balance, a.currency)}
@@ -149,6 +162,13 @@ export function TransferForm({
         type="submit"
         className="w-full"
         disabled={pending || accounts.length === 0 || (mode === "internal" ? accounts.length < 2 : beneficiaries.length === 0)}
+        title={
+          mode === "internal" && accounts.length < 2
+            ? "You need at least two accounts to transfer between your own accounts"
+            : mode === "external" && beneficiaries.length === 0
+              ? "Add a beneficiary first"
+              : undefined
+        }
       >
         {pending ? "Sending…" : "Send transfer"}
       </Button>

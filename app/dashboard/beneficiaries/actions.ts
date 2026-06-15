@@ -46,7 +46,16 @@ export async function updateBeneficiary(id: string, formData: FormData): Promise
   const parsed = parse(formData);
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Please check the form." };
   const supabase = createClient();
-  const { error } = await supabase.from("beneficiaries").update(toRow(parsed.data)).eq("id", id);
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Please sign in again." };
+  // Owner-scope explicitly (defense-in-depth alongside RLS).
+  const { error } = await supabase
+    .from("beneficiaries")
+    .update(toRow(parsed.data))
+    .eq("id", id)
+    .eq("user_id", user.id);
   if (error) return { error: "Could not update the beneficiary. Please try again." };
   revalidatePath("/dashboard/beneficiaries");
   return { ok: true };
@@ -54,7 +63,15 @@ export async function updateBeneficiary(id: string, formData: FormData): Promise
 
 export async function deleteBeneficiary(id: string): Promise<BeneficiaryResult> {
   const supabase = createClient();
-  const { error } = await supabase.from("beneficiaries").delete().eq("id", id);
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Please sign in again." };
+  const { error } = await supabase
+    .from("beneficiaries")
+    .delete()
+    .eq("id", id)
+    .eq("user_id", user.id);
   if (error) return { error: "Could not delete the beneficiary. Please try again." };
   revalidatePath("/dashboard/beneficiaries");
   return { ok: true };
