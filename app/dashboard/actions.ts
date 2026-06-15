@@ -54,7 +54,12 @@ export async function seedDemoData(): Promise<SeedResult> {
     return { error: "Could not create demo transactions. Please try again." };
   }
 
-  await supabase.from("notifications").insert(buildDemoNotifications(user.id));
+  const { error: notifErr } = await supabase
+    .from("notifications")
+    .insert(buildDemoNotifications(user.id));
+  if (notifErr) {
+    return { error: "Could not create demo notifications. Please try again." };
+  }
 
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/accounts");
