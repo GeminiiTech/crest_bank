@@ -142,6 +142,33 @@ reconstructed from transactions (no separate history table).
    (RLS scopes accounts to the owner).
 5. Mobile: the sidebar collapses into a drawer from the topbar menu button.
 
+## Transfers, Beneficiaries & Transactions (M4)
+
+Money movement and transaction management: beneficiaries CRUD, internal/external transfers,
+and a searchable/filterable/paginated transactions page with CSV export.
+
+### Setup
+- Apply migration `0013_execute_transfer.sql` **after** 0001–0012. It adds the atomic
+  `execute_transfer` Postgres function **and drops the M1 `accounts update own` policy** —
+  after this, account balances can only change via the function (clients can no longer write
+  `accounts` directly).
+
+### How money moves
+All balance changes run through one `SECURITY DEFINER` function, `execute_transfer`, in a
+single row-locked transaction: it verifies ownership via `auth.uid()`, checks funds, then
+debits/credits and writes the transaction + transfer rows atomically. External transfers debit
+the sender and are recorded **completed (simulated)** — there's no real settlement rail.
+
+### Manual test plan
+1. **Beneficiaries** → "Add beneficiary"; edit and delete one.
+2. **Transfers** → "Between my accounts": move an amount; both balances change, two
+   transactions appear, and "Recent transfers" updates.
+3. **Transfers** → "To a beneficiary": the source is debited and one transaction is recorded.
+4. Try an amount over your balance → "not enough funds", **no change**. Try the same source
+   and destination → blocked.
+5. **Transactions** → filter by account/type/category/date + search; paginate; click
+   **Export CSV** to download the filtered set.
+
 ## Architecture
 
 ```
@@ -149,7 +176,9 @@ app/
   (marketing)/        route group: navbar + footer shell, landing + stub pages
   (auth)/             login, register, verify-email (+ actions.ts server actions)
   auth/confirm/       email-confirmation GET route
-  dashboard/          authed app: shell layout, overview, accounts/[id], seed action
+  dashboard/          authed app: overview, accounts, beneficiaries, transfers,
+                      transactions (+ export route), seed + transfer/beneficiary actions
+supabase/migrations/0013_execute_transfer.sql  atomic transfer fn + balance-write lockdown
   design-system/      living style guide (noindex)
   layout.tsx          fonts + metadata
 components/
@@ -199,7 +228,8 @@ middleware.ts         session refresh + auth route protection
   protected-route middleware, protected dashboard stub. (Password reset deferred.)
 - **M3 (done):** dashboard shell, overview (balances, spending chart, insights, activity,
   notifications), accounts (list + detail with balance-history), per-user demo seed.
-- **M4:** transfers, beneficiaries, transactions (server-side balance mutations).
+- **M4 (done):** beneficiaries CRUD, internal/external transfers (atomic `execute_transfer`
+  RPC; client account-balance writes locked down), transactions page (search/filter/paginate/CSV).
 - **M5:** cards + settings.
 
 ---
