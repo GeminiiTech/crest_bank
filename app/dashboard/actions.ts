@@ -8,6 +8,7 @@ import {
   buildDemoTransactions,
   buildDemoNotifications,
 } from "@/lib/demo/seed-data";
+import { buildCard } from "@/lib/cards";
 
 export type SeedResult = { error: string } | void;
 
@@ -52,6 +53,15 @@ export async function seedDemoData(): Promise<SeedResult> {
   const { error: txnErr } = await supabase.from("transactions").insert(txnRows);
   if (txnErr) {
     return { error: "Could not create demo transactions. Please try again." };
+  }
+
+  const cardRows = inserted.map((acc, i) => ({
+    ...buildCard(seed + i + 1, { now }),
+    account_id: acc.id,
+  }));
+  const { error: cardErr } = await supabase.from("cards").insert(cardRows);
+  if (cardErr) {
+    return { error: "Could not create demo cards. Please try again." };
   }
 
   const { error: notifErr } = await supabase

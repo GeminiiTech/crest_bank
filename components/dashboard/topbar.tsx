@@ -12,10 +12,12 @@ export function Topbar({
   name,
   email,
   notifications,
+  avatarUrl,
 }: {
   name: string;
   email: string;
   notifications: Notification[];
+  avatarUrl: string | null;
 }) {
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-4 border-b bg-navy-900 px-4 sm:px-6">
@@ -35,7 +37,7 @@ export function Topbar({
       </div>
       <div className="flex items-center gap-2">
         <NotificationsPopover notifications={notifications} />
-        <UserMenu name={name} email={email} />
+        <UserMenu name={name} email={email} avatarUrl={avatarUrl} />
       </div>
     </header>
   );

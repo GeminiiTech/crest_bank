@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { LogOut, User as UserIcon } from "lucide-react";
 import { signOut } from "@/app/(auth)/actions";
 import {
@@ -11,15 +12,19 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
-export function UserMenu({ name, email }: { name: string; email: string }) {
+export function UserMenu({ name, email, avatarUrl }: { name: string; email: string; avatarUrl: string | null }) {
   const initial = (name || email).charAt(0).toUpperCase();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        className="grid h-9 w-9 place-items-center rounded-full bg-primary text-sm font-semibold text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        className="grid h-9 w-9 place-items-center overflow-hidden rounded-full bg-primary text-sm font-semibold text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         aria-label="Open user menu"
       >
-        {initial}
+        {avatarUrl ? (
+          <Image src={avatarUrl} alt="" width={36} height={36} className="h-9 w-9 object-cover" unoptimized />
+        ) : (
+          initial
+        )}
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuLabel className="flex flex-col">

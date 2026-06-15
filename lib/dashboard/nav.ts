@@ -22,6 +22,6 @@ export const dashboardNav: NavItem[] = [
   { label: "Beneficiaries", href: "/dashboard/beneficiaries", icon: Users, enabled: true },
   { label: "Transfers", href: "/dashboard/transfers", icon: ArrowLeftRight, enabled: true },
   { label: "Transactions", href: "/dashboard/transactions", icon: Receipt, enabled: true },
-  { label: "Cards", href: "/dashboard/cards", icon: CreditCard, enabled: false },
-  { label: "Settings", href: "/dashboard/settings", icon: Settings, enabled: false },
+  { label: "Cards", href: "/dashboard/cards", icon: CreditCard, enabled: true },
+  { label: "Settings", href: "/dashboard/settings", icon: Settings, enabled: true },
 ];
