@@ -18,10 +18,11 @@ export async function requestVirtualCard(accountId: string): Promise<CardResult>
     .from("accounts")
     .select("id")
     .eq("id", accountId)
+    .eq("user_id", user.id) // explicit owner check (defense-in-depth alongside RLS)
     .maybeSingle();
   if (!account) return { error: "Account not found." };
 
-  const seed = Math.floor(new Date().getTime() % 1_000_000);
+  const seed = Math.floor(Math.random() * 1_000_000);
   const card = buildCard(seed, { isVirtual: true });
   const { error } = await supabase.from("cards").insert({ ...card, account_id: accountId });
   if (error) return { error: "Could not create the card. Please try again." };
@@ -35,6 +36,10 @@ export async function setCardStatus(
 ): Promise<CardResult> {
   if (status !== "active" && status !== "frozen") return { error: "Invalid status." };
   const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Please sign in again." };
   const { error } = await supabase.from("cards").update({ status }).eq("id", cardId);
   if (error) return { error: "Could not update the card. Please try again." };
   revalidatePath("/dashboard/cards");

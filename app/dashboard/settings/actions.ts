@@ -47,7 +47,8 @@ export async function uploadAvatar(formData: FormData): Promise<SettingsResult> 
   } = await supabase.auth.getUser();
   if (!user) return { error: "Please sign in again." };
 
-  const ext = file.name.split(".").pop()?.toLowerCase() || "png";
+  // Derive the extension from the validated MIME type, not the client filename.
+  const ext = (file.type.split("/")[1] || "png").toLowerCase().replace("jpeg", "jpg");
   const path = `${user.id}/avatar-${Date.now()}.${ext}`;
   const { error: uploadError } = await supabase.storage
     .from("avatars")
