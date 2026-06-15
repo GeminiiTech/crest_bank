@@ -169,6 +169,25 @@ the sender and are recorded **completed (simulated)** — there's no real settle
 5. **Transactions** → filter by account/type/category/date + search; paginate; click
    **Export CSV** to download the filtered set.
 
+## Cards & Settings (M5)
+
+Card management and account settings — the final feature milestone.
+
+### Setup
+- Apply migration `0014_notification_prefs.sql` (after 0001–0013) — adds `profiles.notification_prefs`.
+- Ensure the `avatars` Storage bucket + policies exist (created in M1's `0010`).
+
+### Manual test plan
+1. **Cards** → (re-)seeding creates a debit card per account. **Freeze/Unfreeze** toggles a
+   card's status and dims it. **Request virtual card** (pick an account) adds a virtual card.
+2. **Settings → Profile** → edit name/phone/country and Save (persists); **Upload photo** stores
+   an avatar that then appears in the topbar / user menu.
+3. **Settings → Security** → set a new password (≥8 + confirm), then log out and back in with it.
+4. **Settings → Notifications** → toggle the three preferences and Save; reload to confirm they persist.
+
+Cards are simulated (only `last4` is stored). Password change uses the active session (no
+current-password step).
+
 ## Architecture
 
 ```
@@ -177,8 +196,8 @@ app/
   (auth)/             login, register, verify-email (+ actions.ts server actions)
   auth/confirm/       email-confirmation GET route
   dashboard/          authed app: overview, accounts, beneficiaries, transfers,
-                      transactions (+ export route), seed + transfer/beneficiary actions
-supabase/migrations/0013_execute_transfer.sql  atomic transfer fn + balance-write lockdown
+                      transactions (+ export), cards, settings (+ all server actions)
+supabase/migrations/  0013 atomic transfer fn + balance lockdown; 0014 notification_prefs
   design-system/      living style guide (noindex)
   layout.tsx          fonts + metadata
 components/
@@ -230,7 +249,8 @@ middleware.ts         session refresh + auth route protection
   notifications), accounts (list + detail with balance-history), per-user demo seed.
 - **M4 (done):** beneficiaries CRUD, internal/external transfers (atomic `execute_transfer`
   RPC; client account-balance writes locked down), transactions page (search/filter/paginate/CSV).
-- **M5:** cards + settings.
+- **M5 (done):** cards (view, request virtual, freeze/unfreeze) + settings (profile + avatar
+  upload, change password, notification preferences). **All milestones complete.**
 
 ---
 
