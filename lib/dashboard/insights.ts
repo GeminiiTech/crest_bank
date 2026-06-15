@@ -24,7 +24,7 @@ export function summarizeSpending(
     if (!isSameMonth(t.created_at, now)) continue;
     totals.set(t.category, (totals.get(t.category) ?? 0) + t.amount);
   }
-  return [...totals.entries()]
+  return Array.from(totals.entries())
     .map(([category, total]) => ({ category, total }))
     .sort((a, b) => b.total - a.total);
 }
@@ -87,7 +87,7 @@ export function deriveBalanceHistory(
     running += t.type === "credit" ? t.amount : -t.amount;
     byDate.set(t.created_at.slice(0, 10), running);
   }
-  let series = [...byDate.entries()].map(([date, balance]) => ({ date, balance }));
+  let series = Array.from(byDate.entries()).map(([date, balance]) => ({ date, balance }));
   if (opts.points && series.length > opts.points) {
     series = series.slice(series.length - opts.points);
   }
