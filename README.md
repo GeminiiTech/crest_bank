@@ -119,6 +119,29 @@ Supabase Auth via Next.js Server Actions. Route protection runs in the session m
 6. While logged in, visit `/login` or `/register` → redirected to `/dashboard`.
 7. Click **Sign out** → session cleared, back to `/login`.
 
+## Dashboard (M3)
+
+The authenticated dashboard: a persistent shell (sidebar + topbar), an Overview (balances,
+spending chart, insights, recent activity, notifications), and Accounts (list + per-account
+detail with a derived balance-history chart). Charts use Recharts; balance history is
+reconstructed from transactions (no separate history table).
+
+### Setup
+- Apply migration `0012_notifications_insert_policy.sql` **after** `0001`–`0011` (it lets the
+  per-user demo seed create notifications).
+- No new env vars. Recharts is bundled.
+
+### Manual test plan
+1. Log in → `/dashboard` shows the shell with an **empty state** (no accounts yet).
+2. Click **Set up demo data** → 2 accounts + ~27 transactions + 3 notifications are created;
+   the overview populates (balance cards, spending-by-category chart, insights, recent
+   activity, notifications). Clicking again does nothing (**idempotent**).
+3. **Accounts** → two account cards (masked numbers, balances). Open one → header, a
+   **balance-history** chart, and that account's transactions.
+4. Visit a foreign/unknown account id (`/dashboard/accounts/<random-uuid>`) → **404**
+   (RLS scopes accounts to the owner).
+5. Mobile: the sidebar collapses into a drawer from the topbar menu button.
+
 ## Architecture
 
 ```
@@ -126,7 +149,7 @@ app/
   (marketing)/        route group: navbar + footer shell, landing + stub pages
   (auth)/             login, register, verify-email (+ actions.ts server actions)
   auth/confirm/       email-confirmation GET route
-  dashboard/          protected stub (M2) — real dashboard in M3
+  dashboard/          authed app: shell layout, overview, accounts/[id], seed action
   design-system/      living style guide (noindex)
   layout.tsx          fonts + metadata
 components/
@@ -174,7 +197,8 @@ middleware.ts         session refresh + auth route protection
 - **M1 (done):** foundation — design system, landing page, Supabase wiring, full DB backend.
 - **M2 (done):** auth — email/password register + login, required email verification,
   protected-route middleware, protected dashboard stub. (Password reset deferred.)
-- **M3:** dashboard overview + accounts.
+- **M3 (done):** dashboard shell, overview (balances, spending chart, insights, activity,
+  notifications), accounts (list + detail with balance-history), per-user demo seed.
 - **M4:** transfers, beneficiaries, transactions (server-side balance mutations).
 - **M5:** cards + settings.
 
