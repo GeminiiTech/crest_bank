@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getNotifications } from "@/lib/data/notifications";
+import { getProfile } from "@/lib/data/profile";
 import { SidebarNav } from "@/components/dashboard/sidebar";
 import { Topbar } from "@/components/dashboard/topbar";
 
@@ -17,6 +18,7 @@ export default async function DashboardLayout({
 
   const name = (user.user_metadata?.full_name as string | undefined) ?? user.email ?? "";
   const notifications = await getNotifications();
+  const profile = await getProfile();
 
   return (
     <div className="min-h-screen bg-background lg:grid lg:grid-cols-[16rem_1fr]">
@@ -26,7 +28,7 @@ export default async function DashboardLayout({
         </div>
       </aside>
       <div className="flex min-h-screen flex-col">
-        <Topbar name={name} email={user.email ?? ""} notifications={notifications} />
+        <Topbar name={name} email={user.email ?? ""} notifications={notifications} avatarUrl={profile?.avatar_url ?? null} />
         <main className="flex-1 px-4 py-8 sm:px-6 lg:px-8">{children}</main>
       </div>
     </div>
