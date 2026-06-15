@@ -2,14 +2,8 @@ import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency, maskAccountNumber } from "@/lib/format";
+import { accountTypeLabel } from "@/lib/dashboard/constants";
 import type { Account } from "@/lib/data/accounts";
-
-const TYPE_LABEL: Record<string, string> = {
-  checking: "Checking",
-  savings: "Savings",
-  current: "Current",
-  business: "Business",
-};
 
 export function AccountCard({ account }: { account: Account }) {
   return (
@@ -18,7 +12,7 @@ export function AccountCard({ account }: { account: Account }) {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <p className="text-sm font-medium text-muted-foreground">
-              {TYPE_LABEL[account.type] ?? account.type}
+              {accountTypeLabel(account.type)}
             </p>
             <Badge variant={account.status === "active" ? "success" : "secondary"}>
               {account.status}

@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 
 export type Notification = {
@@ -9,13 +10,16 @@ export type Notification = {
   created_at: string;
 };
 
-export async function getNotifications(limit = 5): Promise<Notification[]> {
-  const supabase = createClient();
-  const { data, error } = await supabase
-    .from("notifications")
-    .select("id, title, body, type, is_read, created_at")
-    .order("created_at", { ascending: false })
-    .limit(limit);
-  if (error || !data) return [];
-  return data as Notification[];
-}
+// cache() dedupes the query within a single render pass (layout + page both read it).
+export const getNotifications = cache(
+  async (limit = 5): Promise<Notification[]> => {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from("notifications")
+      .select("id, title, body, type, is_read, created_at")
+      .order("created_at", { ascending: false })
+      .limit(limit);
+    if (error || !data) return [];
+    return data as Notification[];
+  }
+);

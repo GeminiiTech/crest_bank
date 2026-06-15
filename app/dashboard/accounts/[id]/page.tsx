@@ -4,19 +4,13 @@ import { getAccountById } from "@/lib/data/accounts";
 import { getAccountTransactions } from "@/lib/data/transactions";
 import { deriveBalanceHistory, type TxnLike } from "@/lib/dashboard/insights";
 import { formatCurrency, maskAccountNumber } from "@/lib/format";
+import { accountTypeLabel } from "@/lib/dashboard/constants";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BalanceHistoryChart } from "@/components/dashboard/balance-history-chart";
 import { TransactionRow } from "@/components/dashboard/transaction-row";
 
 export const metadata: Metadata = { title: "Account" };
-
-const TYPE_LABEL: Record<string, string> = {
-  checking: "Checking",
-  savings: "Savings",
-  current: "Current",
-  business: "Business",
-};
 
 export default async function AccountDetailPage({ params }: { params: { id: string } }) {
   const account = await getAccountById(params.id);
@@ -37,7 +31,7 @@ export default async function AccountDetailPage({ params }: { params: { id: stri
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <p className="text-sm font-medium text-muted-foreground">
-              {TYPE_LABEL[account.type] ?? account.type}
+              {accountTypeLabel(account.type)}
             </p>
             <Badge variant={account.status === "active" ? "success" : "secondary"}>
               {account.status}

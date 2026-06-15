@@ -1,6 +1,7 @@
 "use client";
 
 import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis } from "recharts";
+import { formatCurrency } from "@/lib/format";
 
 export function SpendingChart({ data }: { data: { category: string; total: number }[] }) {
   if (data.length === 0) {
@@ -19,7 +20,7 @@ export function SpendingChart({ data }: { data: { category: string; total: numbe
           />
           <Tooltip
             cursor={{ fill: "hsl(var(--muted))" }}
-            formatter={(v) => [`$${Number(v).toFixed(2)}`, "Spent"]}
+            formatter={(v) => [formatCurrency(Number(v)), "Spent"]}
             contentStyle={{ borderRadius: 12, border: "1px solid hsl(var(--border))" }}
           />
           <Bar dataKey="total" radius={[6, 6, 0, 0]}>
