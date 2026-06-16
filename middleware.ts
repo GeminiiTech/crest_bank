@@ -5,8 +5,9 @@ export async function middleware(request: NextRequest) {
   return updateSession(request);
 }
 
+// Only run the session/auth middleware where it matters: the protected dashboard
+// and the auth pages (which redirect already-signed-in users). Public marketing
+// pages skip it entirely, so they navigate instantly without a Supabase round-trip.
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
-  ],
+  matcher: ["/dashboard/:path*", "/login", "/register"],
 };
