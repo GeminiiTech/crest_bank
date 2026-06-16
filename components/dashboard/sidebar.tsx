@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 
 export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
+  const tourKey = (href: string) => (href === "/dashboard" ? "dashboard" : href.split("/").pop());
   return (
     <nav className="flex h-full flex-col gap-1 p-4" aria-label="Dashboard">
       <div className="mb-6 px-2">
@@ -22,6 +23,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
           return (
             <span
               key={item.label}
+              data-tour={tourKey(item.href)}
               className="flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-slate-500"
               aria-disabled="true"
             >
@@ -38,6 +40,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
         return (
           <Link
             key={item.label}
+            data-tour={tourKey(item.href)}
             href={item.href}
             onClick={onNavigate}
             aria-current={active ? "page" : undefined}
