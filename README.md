@@ -169,6 +169,14 @@ the sender and are recorded **completed (simulated)** — there's no real settle
 5. **Transactions** → filter by account/type/category/date + search; paginate; click
    **Export CSV** to download the filtered set.
 
+## Onboarding tour
+
+New users get a skippable **spotlight tour** of the dashboard sidebar on their first visit
+(highlights each section with a tooltip; Next/Back/Skip, Esc to exit). It's remembered in the
+browser via the `localStorage` key `crest_tour_seen`, so it won't auto-show again — and the
+**"Take the tour"** button in the dashboard topbar replays it anytime. No backend or migration;
+to re-trigger the auto-start, clear that key in your browser dev tools.
+
 ## Cards & Settings (M5)
 
 Card management and account settings — the final feature milestone.

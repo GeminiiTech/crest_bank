@@ -7,6 +7,7 @@ import { SidebarNav } from "@/components/dashboard/sidebar";
 import { UserMenu } from "@/components/dashboard/user-menu";
 import { NotificationsPopover } from "@/components/dashboard/notifications-popover";
 import type { Notification } from "@/lib/data/notifications";
+import { TourLauncher } from "@/components/dashboard/tour/tour-launcher";
 
 export function Topbar({
   name,
@@ -36,6 +37,7 @@ export function Topbar({
         <span className="font-display text-sm font-semibold text-white lg:hidden">Crest Bank</span>
       </div>
       <div className="flex items-center gap-2">
+        <TourLauncher />
         <NotificationsPopover notifications={notifications} />
         <UserMenu name={name} email={email} avatarUrl={avatarUrl} />
       </div>
