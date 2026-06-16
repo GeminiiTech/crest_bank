@@ -33,6 +33,7 @@ export function TourOverlay({
 
   const [layout, setLayout] = React.useState<SpotlightLayout | null>(null);
   const cardRef = React.useRef<HTMLDivElement>(null);
+  const maskId = React.useId();
 
   const measure = React.useCallback(() => {
     const el = document.querySelector(`[data-tour="${step.key}"]`);
@@ -76,14 +77,14 @@ export function TourOverlay({
     <div className="fixed inset-0 z-[60]" role="dialog" aria-modal="true" aria-label={step.title}>
       <svg className="absolute inset-0 h-full w-full" aria-hidden="true">
         <defs>
-          <mask id="crest-tour-mask">
+          <mask id={maskId}>
             <rect width="100%" height="100%" fill="white" />
             {hole && (
               <rect x={hole.left} y={hole.top} width={hole.width} height={hole.height} rx="12" fill="black" />
             )}
           </mask>
         </defs>
-        <rect width="100%" height="100%" fill="rgba(8,21,43,0.6)" mask="url(#crest-tour-mask)" />
+        <rect width="100%" height="100%" fill="rgba(8,21,43,0.6)" mask={`url(#${maskId})`} />
       </svg>
 
       {hole && (
@@ -97,6 +98,8 @@ export function TourOverlay({
       <div
         ref={cardRef}
         tabIndex={-1}
+        aria-live="polite"
+        aria-atomic="true"
         className="absolute w-80 rounded-2xl border bg-card p-5 text-card-foreground shadow-card outline-none"
         style={{ top: tooltip.top, left: tooltip.left }}
       >
