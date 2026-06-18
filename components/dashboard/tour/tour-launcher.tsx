@@ -11,7 +11,7 @@ export function TourLauncher() {
       type="button"
       variant="ghost"
       size="icon"
-      onClick={start}
+      onClick={() => start()}
       aria-label="Take the tour"
       className="text-slate-200 hover:bg-white/10 hover:text-white"
     >

@@ -2,8 +2,8 @@
 
 import * as React from "react";
 import { X } from "lucide-react";
-import { tourSteps } from "@/lib/tour/steps";
 import { computeSpotlightLayout, type Rect, type SpotlightLayout } from "@/lib/tour/position";
+import type { TourStep } from "@/lib/tour/registry";
 import { Button } from "@/components/ui/button";
 
 const TOOLTIP = { width: 320, height: 210 };
@@ -16,18 +16,20 @@ function rectOf(el: Element | null): Rect | null {
 }
 
 export function TourOverlay({
+  steps,
   stepIndex,
   onNext,
   onBack,
   onClose,
 }: {
+  steps: TourStep[];
   stepIndex: number;
   onNext: () => void;
   onBack: () => void;
   onClose: () => void;
 }) {
-  const step = tourSteps[stepIndex];
-  const total = tourSteps.length;
+  const step = steps[stepIndex];
+  const total = steps.length;
   const isLast = stepIndex === total - 1;
   const isFirst = stepIndex === 0;
 
@@ -36,7 +38,7 @@ export function TourOverlay({
   const maskId = React.useId();
 
   const measure = React.useCallback(() => {
-    const el = document.querySelector(`[data-tour="${step.key}"]`);
+    const el = step.key ? document.querySelector(`[data-tour="${step.key}"]`) : null;
     if (el) el.scrollIntoView({ block: "nearest", inline: "nearest" });
     const target = rectOf(el);
     setLayout(
