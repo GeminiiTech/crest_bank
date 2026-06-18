@@ -32,7 +32,7 @@ export default async function TransactionsPage({
       <div className="flex items-center justify-between gap-4">
         <h1 className="font-display text-2xl font-bold tracking-tight">Transactions</h1>
         <Button asChild variant="outline">
-          <a href={`/dashboard/transactions/export?${exportParams.toString()}`}>
+          <a href={`/dashboard/transactions/export?${exportParams.toString()}`} data-tour="transactions-export">
             <Download className="mr-1.5 h-4 w-4" /> Export CSV
           </a>
         </Button>
@@ -40,7 +40,7 @@ export default async function TransactionsPage({
       <Card>
         <CardContent className="space-y-5 p-5">
           <TransactionsFilters accounts={accounts} />
-          <TransactionsTable rows={rows} />
+          <div data-tour="transactions-table"><TransactionsTable rows={rows} /></div>
           <Pagination page={query.page} pageSize={query.pageSize} total={total} />
         </CardContent>
       </Card>

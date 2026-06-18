@@ -34,7 +34,7 @@ export function CardsGrid({ cards, accounts }: { cards: CardType[]; accounts: Ac
 
   return (
     <div className="space-y-6">
-      <Card>
+      <Card data-tour="cards-request">
         <CardContent className="flex flex-wrap items-end gap-3 p-5">
           <div className="flex-1">
             <label htmlFor="card-account" className="mb-1 block text-sm font-medium">Request a virtual card for</label>
@@ -64,7 +64,7 @@ export function CardsGrid({ cards, accounts }: { cards: CardType[]; accounts: Ac
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3" data-tour="cards-manage">
           {cards.map((card) => (
             <div key={card.id} className="space-y-3">
               <CardVisual card={card} />

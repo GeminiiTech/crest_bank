@@ -69,7 +69,7 @@ export function TransferForm({
 
   return (
     <form onSubmit={submit} className="space-y-4">
-      <div className="inline-flex rounded-xl border bg-muted p-1">
+      <div className="inline-flex rounded-xl border bg-muted p-1" data-tour="transfers-mode">
         {(["internal", "external"] as Mode[]).map((m) => (
           <button
             key={m}
@@ -85,7 +85,7 @@ export function TransferForm({
       {error && <p role="alert" className="rounded-lg bg-rose-500/10 px-3 py-2 text-sm text-rose-500">{error}</p>}
       {success && <p role="status" className="rounded-lg bg-success/10 px-3 py-2 text-sm text-success">{success}</p>}
 
-      <div>
+      <div data-tour="transfers-from">
         <label htmlFor="tf-from" className="mb-1 block text-sm font-medium">From account</label>
         <select
           id="tf-from"
@@ -139,7 +139,7 @@ export function TransferForm({
         </div>
       )}
 
-      <div>
+      <div data-tour="transfers-amount">
         <label htmlFor="tf-amount" className="mb-1 block text-sm font-medium">Amount</label>
         <Input
           id="tf-amount"
@@ -161,6 +161,7 @@ export function TransferForm({
       <Button
         type="submit"
         className="w-full"
+        data-tour="transfers-send"
         disabled={pending || accounts.length === 0 || (mode === "internal" ? accounts.length < 2 : beneficiaries.length === 0)}
         title={
           mode === "internal" && accounts.length < 2

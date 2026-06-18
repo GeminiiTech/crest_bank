@@ -15,13 +15,15 @@ export default async function BeneficiariesPage() {
     <div className="mx-auto max-w-7xl space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="font-display text-2xl font-bold tracking-tight">Beneficiaries</h1>
-        <BeneficiaryForm
-          trigger={
-            <Button>
-              <Plus className="mr-1.5 h-4 w-4" /> Add beneficiary
-            </Button>
-          }
-        />
+        <span data-tour="beneficiaries-add">
+          <BeneficiaryForm
+            trigger={
+              <Button>
+                <Plus className="mr-1.5 h-4 w-4" /> Add beneficiary
+              </Button>
+            }
+          />
+        </span>
       </div>
       {beneficiaries.length === 0 ? (
         <Card>
@@ -30,7 +32,7 @@ export default async function BeneficiariesPage() {
           </CardContent>
         </Card>
       ) : (
-        <BeneficiaryList beneficiaries={beneficiaries} />
+        <div data-tour="beneficiaries-list"><BeneficiaryList beneficiaries={beneficiaries} /></div>
       )}
     </div>
   );
