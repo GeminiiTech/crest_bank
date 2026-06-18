@@ -171,11 +171,17 @@ the sender and are recorded **completed (simulated)** — there's no real settle
 
 ## Onboarding tour
 
-New users get a skippable **spotlight tour** of the dashboard sidebar on their first visit
-(highlights each section with a tooltip; Next/Back/Skip, Esc to exit). It's remembered in the
-browser via the `localStorage` key `crest_tour_seen`, so it won't auto-show again — and the
-**"Take the tour"** button in the dashboard topbar replays it anytime. No backend or migration;
-to re-trigger the auto-start, clear that key in your browser dev tools.
+New users get skippable **spotlight tours** (highlight + tooltip; Next/Back/Skip, Esc to exit):
+
+- **Overview:** on the first dashboard visit, a tour of the sidebar sections.
+- **Per page:** the first visit to Accounts, Beneficiaries, Transfers, Transactions, Cards, and
+  Settings auto-runs that page's own tour, highlighting its key controls. A step whose target
+  isn't on screen (e.g. an empty state) is skipped automatically.
+
+Each tour is remembered separately in the browser (`crest_tour_seen` for the overview;
+`crest_tour_<page>_seen` for each page), so none re-shows after it's seen. The **"Take the tour"**
+button in the dashboard topbar replays the **current page's** tour. No backend or migration; to
+re-trigger an auto-start, clear the relevant key in your browser dev tools.
 
 ## Cards & Settings (M5)
 
