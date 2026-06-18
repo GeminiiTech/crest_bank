@@ -72,7 +72,7 @@ const config: Config = {
         "3xl": "1.5rem",
       },
       boxShadow: {
-        card: "0 1px 3px rgba(8,21,43,.06), 0 8px 24px rgba(8,21,43,.06)",
+        card: "0 1px 2px rgba(8,21,43,.04), 0 3px 10px rgba(8,21,43,.04)",
       },
       keyframes: {
         "accordion-down": {
