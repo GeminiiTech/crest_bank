@@ -38,23 +38,37 @@ export function TourOverlay({
   const maskId = React.useId();
 
   const measure = React.useCallback(() => {
-    const el = step.key ? document.querySelector(`[data-tour="${step.key}"]`) : null;
-    if (el) el.scrollIntoView({ block: "nearest", inline: "nearest" });
-    const target = rectOf(el);
+    if (step.key) {
+      const el = document.querySelector(`[data-tour="${step.key}"]`);
+      // Target-bound step whose element isn't on the page (e.g. an empty state):
+      // skip it rather than show a tooltip pointing at nothing.
+      if (!el) {
+        if (isLast) onClose();
+        else onNext();
+        return;
+      }
+      el.scrollIntoView({ block: "nearest", inline: "nearest" });
+    }
+    const target = step.key ? rectOf(document.querySelector(`[data-tour="${step.key}"]`)) : null;
     setLayout(
       computeSpotlightLayout(target, TOOLTIP, {
         width: window.innerWidth,
         height: window.innerHeight,
       })
     );
-  }, [step.key]);
+  }, [step.key, isLast, onNext, onClose]);
 
   React.useEffect(() => {
+    let raf = 0;
     measure();
-    const onResize = () => measure();
+    const onResize = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(measure);
+    };
     window.addEventListener("resize", onResize, { passive: true });
     window.addEventListener("scroll", onResize, { passive: true });
     return () => {
+      cancelAnimationFrame(raf);
       window.removeEventListener("resize", onResize);
       window.removeEventListener("scroll", onResize);
     };
