@@ -17,7 +17,7 @@ export default async function SettingsPage() {
     <div className="mx-auto max-w-3xl space-y-6">
       <h1 className="font-display text-2xl font-bold tracking-tight">Settings</h1>
 
-      <Card>
+      <Card data-tour="settings-profile">
         <CardHeader>
           <CardTitle>Profile</CardTitle>
         </CardHeader>
@@ -27,7 +27,7 @@ export default async function SettingsPage() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card data-tour="settings-security">
         <CardHeader>
           <CardTitle>Security</CardTitle>
         </CardHeader>
@@ -36,7 +36,7 @@ export default async function SettingsPage() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card data-tour="settings-notifications">
         <CardHeader>
           <CardTitle>Notifications</CardTitle>
         </CardHeader>

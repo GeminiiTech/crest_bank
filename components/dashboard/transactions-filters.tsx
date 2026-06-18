@@ -23,7 +23,7 @@ export function TransactionsFilters({ accounts }: { accounts: Account[] }) {
   );
 
   return (
-    <div className="flex flex-wrap items-end gap-3">
+    <div className="flex flex-wrap items-end gap-3" data-tour="transactions-filters">
       <div className="min-w-[12rem] flex-1">
         <label htmlFor="f-search" className="mb-1 block text-xs font-medium text-muted-foreground">Search</label>
         <Input

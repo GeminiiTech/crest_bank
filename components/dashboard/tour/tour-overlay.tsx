@@ -2,8 +2,8 @@
 
 import * as React from "react";
 import { X } from "lucide-react";
-import { tourSteps } from "@/lib/tour/steps";
 import { computeSpotlightLayout, type Rect, type SpotlightLayout } from "@/lib/tour/position";
+import type { TourStep } from "@/lib/tour/registry";
 import { Button } from "@/components/ui/button";
 
 const TOOLTIP = { width: 320, height: 210 };
@@ -16,18 +16,20 @@ function rectOf(el: Element | null): Rect | null {
 }
 
 export function TourOverlay({
+  steps,
   stepIndex,
   onNext,
   onBack,
   onClose,
 }: {
+  steps: TourStep[];
   stepIndex: number;
   onNext: () => void;
   onBack: () => void;
   onClose: () => void;
 }) {
-  const step = tourSteps[stepIndex];
-  const total = tourSteps.length;
+  const step = steps[stepIndex];
+  const total = steps.length;
   const isLast = stepIndex === total - 1;
   const isFirst = stepIndex === 0;
 
@@ -36,23 +38,37 @@ export function TourOverlay({
   const maskId = React.useId();
 
   const measure = React.useCallback(() => {
-    const el = document.querySelector(`[data-tour="${step.key}"]`);
-    if (el) el.scrollIntoView({ block: "nearest", inline: "nearest" });
-    const target = rectOf(el);
+    if (step.key) {
+      const el = document.querySelector(`[data-tour="${step.key}"]`);
+      // Target-bound step whose element isn't on the page (e.g. an empty state):
+      // skip it rather than show a tooltip pointing at nothing.
+      if (!el) {
+        if (isLast) onClose();
+        else onNext();
+        return;
+      }
+      el.scrollIntoView({ block: "nearest", inline: "nearest" });
+    }
+    const target = step.key ? rectOf(document.querySelector(`[data-tour="${step.key}"]`)) : null;
     setLayout(
       computeSpotlightLayout(target, TOOLTIP, {
         width: window.innerWidth,
         height: window.innerHeight,
       })
     );
-  }, [step.key]);
+  }, [step.key, isLast, onNext, onClose]);
 
   React.useEffect(() => {
+    let raf = 0;
     measure();
-    const onResize = () => measure();
+    const onResize = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(measure);
+    };
     window.addEventListener("resize", onResize, { passive: true });
     window.addEventListener("scroll", onResize, { passive: true });
     return () => {
+      cancelAnimationFrame(raf);
       window.removeEventListener("resize", onResize);
       window.removeEventListener("scroll", onResize);
     };
