@@ -1,4 +1,4 @@
-const PROTECTED_PREFIXES = ["/dashboard"];
+const PROTECTED_PREFIXES = ["/dashboard", "/admin"];
 const AUTH_ONLY_PATHS = ["/login", "/register"];
 
 export function sanitizeNext(next: string | null | undefined): string {
