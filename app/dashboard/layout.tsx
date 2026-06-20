@@ -30,7 +30,7 @@ export default async function DashboardLayout({
           </div>
         </aside>
         <div className="flex min-h-screen flex-col">
-          <Topbar name={name} email={user.email ?? ""} notifications={notifications} avatarUrl={profile?.avatar_url ?? null} />
+          <Topbar name={name} email={user.email ?? ""} notifications={notifications} avatarUrl={profile?.avatar_url ?? null} isAdmin={profile?.role === "admin"} />
           <main className="flex-1 px-4 py-8 sm:px-6 lg:px-8">{children}</main>
         </div>
       </div>

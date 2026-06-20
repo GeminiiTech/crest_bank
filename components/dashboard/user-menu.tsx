@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { LogOut, User as UserIcon } from "lucide-react";
+import Link from "next/link";
+import { LogOut, ShieldCheck, User as UserIcon } from "lucide-react";
 import { signOut } from "@/app/(auth)/actions";
 import {
   DropdownMenu,
@@ -12,7 +13,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
-export function UserMenu({ name, email, avatarUrl }: { name: string; email: string; avatarUrl: string | null }) {
+export function UserMenu({ name, email, avatarUrl, isAdmin }: { name: string; email: string; avatarUrl: string | null; isAdmin: boolean }) {
   const initial = (name || email).charAt(0).toUpperCase();
   return (
     <DropdownMenu>
@@ -35,6 +36,13 @@ export function UserMenu({ name, email, avatarUrl }: { name: string; email: stri
         <DropdownMenuItem className="text-muted-foreground" disabled>
           <UserIcon className="mr-2 h-4 w-4" /> Profile (soon)
         </DropdownMenuItem>
+        {isAdmin && (
+          <DropdownMenuItem asChild>
+            <Link href="/admin" className="flex w-full items-center">
+              <ShieldCheck className="mr-2 h-4 w-4" /> Admin panel
+            </Link>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem asChild>
           <form action={signOut}>
             <button type="submit" className="flex w-full items-center">
