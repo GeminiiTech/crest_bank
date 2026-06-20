@@ -15,6 +15,7 @@ const selectClass = "h-10 rounded-lg border border-input bg-background px-3 text
 export function AccountEditor({ userId, account }: { userId: string; account: AdminAccount }) {
   const [msg, setMsg] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const [status, setStatus] = useState(account.status);
 
   function saveBalance(formData: FormData) {
     setMsg(null);
@@ -24,11 +25,16 @@ export function AccountEditor({ userId, account }: { userId: string; account: Ad
     });
   }
 
-  function changeStatus(status: string) {
+  function changeStatus(next: string) {
     setMsg(null);
     startTransition(async () => {
-      const result = await setAccountStatus(userId, account.id, status as "active" | "frozen" | "closed");
-      setMsg("error" in result ? result.error : "Status updated.");
+      const result = await setAccountStatus(userId, account.id, next as "active" | "frozen" | "closed");
+      if ("error" in result) {
+        setMsg(result.error);
+      } else {
+        setStatus(next);
+        setMsg("Status updated.");
+      }
     });
   }
 
@@ -37,7 +43,7 @@ export function AccountEditor({ userId, account }: { userId: string; account: Ad
       <CardContent className="space-y-3 p-5">
         <div className="flex items-center justify-between">
           <p className="font-medium">{accountTypeLabel(account.type)} · {maskAccountNumber(account.account_number)}</p>
-          <select className={selectClass} defaultValue={account.status} onChange={(e) => changeStatus(e.target.value)} disabled={pending} aria-label="Account status">
+          <select className={selectClass} value={status} onChange={(e) => changeStatus(e.target.value)} disabled={pending} aria-label="Account status">
             {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
           </select>
         </div>

@@ -51,10 +51,15 @@ export function BeneficiaryManager({ userId, beneficiaries }: { userId: string; 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
   const [pending, startTransition] = useTransition();
+  const [msg, setMsg] = useState<string | null>(null);
 
   function remove(id: string) {
     if (!confirm("Delete this beneficiary?")) return;
-    startTransition(() => { void deleteBeneficiaryFor(userId, id); });
+    setMsg(null);
+    startTransition(async () => {
+      const result = await deleteBeneficiaryFor(userId, id);
+      if ("error" in result) setMsg(result.error);
+    });
   }
 
   return (
@@ -64,6 +69,7 @@ export function BeneficiaryManager({ userId, beneficiaries }: { userId: string; 
       ) : (
         <Button size="sm" onClick={() => setAdding(true)}><Plus className="mr-1.5 h-4 w-4" /> Add beneficiary</Button>
       )}
+      {msg && <p className="text-xs text-rose-500">{msg}</p>}
       <div className="space-y-2">
         {beneficiaries.map((b) =>
           editingId === b.id ? (
