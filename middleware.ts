@@ -9,5 +9,5 @@ export async function middleware(request: NextRequest) {
 // and the auth pages (which redirect already-signed-in users). Public marketing
 // pages skip it entirely, so they navigate instantly without a Supabase round-trip.
 export const config = {
-  matcher: ["/dashboard/:path*", "/login", "/register"],
+  matcher: ["/dashboard/:path*", "/admin/:path*", "/login", "/register"],
 };

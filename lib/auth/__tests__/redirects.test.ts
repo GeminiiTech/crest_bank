@@ -30,4 +30,11 @@ describe("resolveAuthRedirect", () => {
     expect(resolveAuthRedirect("/dashboard", true)).toBeNull();
     expect(resolveAuthRedirect("/login", false)).toBeNull();
   });
+  it("protects /admin routes when logged out", () => {
+    expect(resolveAuthRedirect("/admin", false)).toBe("/login?next=%2Fadmin");
+    expect(resolveAuthRedirect("/admin/users/abc", false)).toBe("/login?next=%2Fadmin%2Fusers%2Fabc");
+  });
+  it("does not redirect a logged-in user away from /admin", () => {
+    expect(resolveAuthRedirect("/admin", true)).toBeNull();
+  });
 });

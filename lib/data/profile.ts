@@ -13,6 +13,7 @@ export type Profile = {
   country: string | null;
   avatar_url: string | null;
   notification_prefs: NotificationPrefsValue;
+  role: "customer" | "admin";
 };
 
 const DEFAULT_PREFS: NotificationPrefsValue = { product: true, security: true, transfers: true };
@@ -25,12 +26,13 @@ export async function getProfile(): Promise<Profile | null> {
   if (!user) return null;
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, full_name, phone, country, avatar_url, notification_prefs")
+    .select("id, full_name, phone, country, avatar_url, notification_prefs, role")
     .eq("id", user.id)
     .maybeSingle();
   if (error || !data) return null;
   return {
     ...data,
     notification_prefs: { ...DEFAULT_PREFS, ...((data.notification_prefs as Record<string, boolean> | null) ?? {}) },
+    role: (data.role as "customer" | "admin") ?? "customer",
   } as Profile;
 }

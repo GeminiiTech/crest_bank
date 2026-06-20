@@ -169,6 +169,33 @@ the sender and are recorded **completed (simulated)** — there's no real settle
 5. **Transactions** → filter by account/type/category/date + search; paginate; click
    **Export CSV** to download the filtered set.
 
+## Admin panel
+
+Staff with `profiles.role = 'admin'` get an admin area at **`/admin`** to manage every user.
+
+### Setup
+- Requires **`SUPABASE_SERVICE_ROLE_KEY`** set (server-only; in Vercel's env or `.env.local`). The
+  admin features run server-side with the service role (which bypasses RLS) **only after** an admin
+  check — the key is never sent to the browser.
+- **Bootstrap your first admin** (run once in Supabase → SQL Editor; replace the email):
+  ```sql
+  update public.profiles set role = 'admin'
+  where id = (select id from auth.users where email = 'you@example.com');
+  ```
+- Sign in → an **"Admin panel"** entry appears in the dashboard user menu (admins only) → `/admin`.
+
+### What admins can do
+- **Users list** (`/admin`): every user with email, role, KYC, account count, and total balance; search.
+- **User detail** (`/admin/users/<id>`): profile + insights (total balance, income/spending this
+  month), accounts, transactions, cards, beneficiaries.
+- **Edit:** profile fields incl. **role** (promote/demote) and **KYC**; **account balance** (records
+  an "Adjustment" transaction for the difference) and **status**; **add/delete transactions**
+  (account balance moves/reverts); **freeze/unfreeze cards**; **add/edit/delete beneficiaries**.
+
+Authorization is enforced at three layers: middleware (`/admin` requires auth), the admin layout
+(`requireAdmin()` redirects non-admins), and every admin server action (re-checks admin before any
+write). Never commit the service-role key.
+
 ## Onboarding tour
 
 New users get skippable **spotlight tours** (highlight + tooltip; Next/Back/Skip, Esc to exit):
