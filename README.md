@@ -190,7 +190,8 @@ Staff with `profiles.role = 'admin'` get an admin area at **`/admin`** to manage
   month), accounts, transactions, cards, beneficiaries.
 - **Edit:** profile fields incl. **role** (promote/demote) and **KYC**; **account balance** (records
   an "Adjustment" transaction for the difference) and **status**; **add/delete transactions**
-  (account balance moves/reverts); **freeze/unfreeze cards**; **add/edit/delete beneficiaries**.
+  (account balance moves/reverts) and **edit a transaction's date**; **freeze/unfreeze cards**;
+  **add/edit/delete beneficiaries**.
 
 Authorization is enforced at three layers: middleware (`/admin` requires auth), the admin layout
 (`requireAdmin()` redirects non-admins), and every admin server action (re-checks admin before any
