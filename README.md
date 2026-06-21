@@ -197,6 +197,12 @@ Authorization is enforced at three layers: middleware (`/admin` requires auth), 
 (`requireAdmin()` redirects non-admins), and every admin server action (re-checks admin before any
 write). Never commit the service-role key.
 
+## Profile
+
+A signed-in user can view their details at **`/dashboard/profile`** (opened from the user menu →
+"Profile"): avatar, name, email, phone, country, KYC status, and member-since. Editing lives in
+**Settings** (the page links there).
+
 ## Onboarding tour
 
 New users get skippable **spotlight tours** (highlight + tooltip; Next/Back/Skip, Esc to exit):

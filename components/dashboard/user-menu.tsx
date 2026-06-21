@@ -33,8 +33,10 @@ export function UserMenu({ name, email, avatarUrl, isAdmin }: { name: string; em
           <span className="text-xs font-normal text-muted-foreground">{email}</span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="text-muted-foreground" disabled>
-          <UserIcon className="mr-2 h-4 w-4" /> Profile (soon)
+        <DropdownMenuItem asChild>
+          <Link href="/dashboard/profile" className="flex w-full items-center">
+            <UserIcon className="mr-2 h-4 w-4" /> Profile
+          </Link>
         </DropdownMenuItem>
         {isAdmin && (
           <DropdownMenuItem asChild>
