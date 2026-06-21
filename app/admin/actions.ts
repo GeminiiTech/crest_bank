@@ -6,6 +6,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { adminProfileSchema, adminBalanceSchema, adminTransactionSchema } from "@/lib/validations/admin";
 import { beneficiarySchema } from "@/lib/validations/beneficiary";
 import { computeBalanceAdjustment, signedDelta } from "@/lib/admin/adjustment";
+import { toCreatedAtISO } from "@/lib/admin/dates";
 
 export type AdminResult = { error: string } | { ok: true };
 
@@ -109,6 +110,13 @@ export async function addTransaction(
     description: formData.get("description") || undefined,
   });
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Check the form." };
+  const rawDate = formData.get("date")?.toString();
+  let createdAt: string | undefined;
+  if (rawDate) {
+    const iso = toCreatedAtISO(rawDate);
+    if (!iso) return { error: "Enter a valid date." };
+    createdAt = iso;
+  }
   const admin = createAdminClient();
   const { data: account } = await admin.from("accounts").select("balance, currency").eq("id", accountId).maybeSingle();
   if (!account) return { error: "Account not found." };
@@ -122,6 +130,7 @@ export async function addTransaction(
     status: "completed",
     description: parsed.data.description || null,
     counterparty: "Admin",
+    ...(createdAt ? { created_at: createdAt } : {}),
   });
   if (insErr) return { error: "Could not add the transaction." };
   const newBalance = Number(account.balance) + signedDelta(parsed.data.type, parsed.data.amount);
@@ -146,6 +155,21 @@ export async function deleteTransaction(userId: string, transactionId: string): 
     const reversed = Number(account.balance) - signedDelta(txn.type as "credit" | "debit", Number(txn.amount));
     await admin.from("accounts").update({ balance: reversed }).eq("id", txn.account_id as string);
   }
+  revalidateUser(userId);
+  return { ok: true };
+}
+
+export async function updateTransactionDate(
+  userId: string,
+  transactionId: string,
+  formData: FormData
+): Promise<AdminResult> {
+  if (!(await getAdminOrNull())) return { error: "Not authorized." };
+  const iso = toCreatedAtISO(formData.get("date")?.toString() ?? "");
+  if (!iso) return { error: "Enter a valid date." };
+  const admin = createAdminClient();
+  const { error } = await admin.from("transactions").update({ created_at: iso }).eq("id", transactionId);
+  if (error) return { error: "Could not update the date." };
   revalidateUser(userId);
   return { ok: true };
 }
