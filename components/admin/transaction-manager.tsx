@@ -3,8 +3,8 @@
 import { useState, useTransition } from "react";
 import { Trash2 } from "lucide-react";
 import type { AdminAccount, AdminTransaction } from "@/lib/admin/data";
-import { addTransaction, deleteTransaction } from "@/app/admin/actions";
-import { formatCurrency, formatTxnDate } from "@/lib/format";
+import { addTransaction, deleteTransaction, updateTransactionDate } from "@/app/admin/actions";
+import { formatCurrency } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -23,6 +23,18 @@ export function TransactionManager({
   const [accountId, setAccountId] = useState(accounts[0]?.id ?? "");
   const [msg, setMsg] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+
+  const today = new Date().toISOString().slice(0, 10);
+
+  function changeDate(id: string, date: string) {
+    setMsg(null);
+    startTransition(async () => {
+      const fd = new FormData();
+      fd.set("date", date);
+      const result = await updateTransactionDate(userId, id, fd);
+      setMsg("error" in result ? result.error : "Date updated.");
+    });
+  }
 
   function add(formData: FormData) {
     if (!accountId) return;
@@ -46,6 +58,10 @@ export function TransactionManager({
     <div className="space-y-4">
       {accounts.length > 0 && (
         <form action={add} className="flex flex-wrap items-end gap-3 rounded-xl border bg-card p-4">
+          <div>
+            <label className="mb-1 block text-xs font-medium text-muted-foreground">Date</label>
+            <input type="date" name="date" defaultValue={today} className={selectClass} aria-label="Transaction date" />
+          </div>
           <div>
             <label className="mb-1 block text-xs font-medium text-muted-foreground">Account</label>
             <select className={selectClass} value={accountId} onChange={(e) => setAccountId(e.target.value)} aria-label="Account">
@@ -89,7 +105,16 @@ export function TransactionManager({
           <tbody>
             {transactions.map((t) => (
               <tr key={t.id} className="border-b last:border-0">
-                <td className="px-3 py-2 text-muted-foreground">{formatTxnDate(t.created_at)}</td>
+                <td className="px-3 py-2">
+                  <input
+                    type="date"
+                    defaultValue={t.created_at.slice(0, 10)}
+                    onChange={(e) => changeDate(t.id, e.target.value)}
+                    disabled={pending}
+                    aria-label="Transaction date"
+                    className="h-9 rounded-lg border border-input bg-background px-2 text-sm"
+                  />
+                </td>
                 <td className="px-3 py-2">{t.description ?? t.counterparty ?? "—"}</td>
                 <td className="px-3 py-2 text-muted-foreground">{t.category}</td>
                 <td className={cn("px-3 py-2 text-right font-semibold", t.type === "credit" ? "text-success" : "text-foreground")}>
